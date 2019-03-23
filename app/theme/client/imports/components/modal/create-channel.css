@@ -8,7 +8,7 @@
 	animation-duration: 1s;
 
 	&__content {
-		/*overflow: auto;*/
+		/* overflow: auto; */
 		flex: 1 1 auto;
 
 		margin: 0 -40px;
