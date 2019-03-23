@@ -94,6 +94,7 @@ export const create = ({ prid, pmid, t_name, reply, users }) => {
 		description: message.msg, // TODO threads remove
 		topic: p_room.name, // TODO threads remove
 		prid,
+		tags: ['yo', 'yo2'], // Custom tags
 	});
 
 	if (pmid) {

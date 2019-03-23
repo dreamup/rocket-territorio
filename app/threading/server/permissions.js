@@ -6,6 +6,7 @@ Meteor.startup(() => {
 	const permissions = [
 		{ _id: 'start-thread', roles: ['admin', 'user', 'expert', 'guest'] },
 		{ _id: 'start-thread-other-user', roles: ['admin', 'user', 'expert', 'owner'] },
+		{ _id: 'start-thread-custom', roles: ['admin', 'user', 'expert', 'owner'] },
 	];
 
 	for (const permission of permissions) {

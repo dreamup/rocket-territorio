@@ -22,6 +22,41 @@ Template.CreateThread.helpers({
 			return 'disabled';
 		}
 	},
+	isFirstSlide() {
+		return Template.instance().modalSlideState.get() === 0;
+	},
+	isSecondSlide() {
+		return Template.instance().modalSlideState.get() === 1;
+	},
+	isThirdSlide() {
+		return Template.instance().modalSlideState.get() === 2;
+	},
+	isLastSlide() {
+		return Template.instance().modalSlideState.get() === 3;
+	},
+	prevIsDisabled() {
+		if (Template.instance().modalSlideState.get() > 0) {
+			return '';
+		}
+		return 'disabled';
+	},
+	nextIsDisabled() {
+		const instance = Template.instance();
+		const modalSlideState = instance.modalSlideState.get();
+		if (modalSlideState === 0 && instance.parentChannel.get()) {
+			return '';
+		}
+		if (modalSlideState === 1) {
+			return '';
+		}
+		if (modalSlideState === 2 && instance.threadName.get()) {
+			return '';
+		}
+		if (modalSlideState === 3 && instance.reply.get()) {
+			return '';
+		}
+		return 'disabled';
+	},
 	targetChannelText() {
 		const instance = Template.instance();
 		const parentChannel = instance.parentChannel.get();
@@ -97,6 +132,24 @@ Template.CreateThread.events({
 		const { value } = e.target;
 		t.reply.set(value);
 	},
+	'click #next'(e, t) {
+		const oldModalSlideState = t.modalSlideState.get();
+		if (oldModalSlideState > 2) {
+			return false;
+		}
+		const newModalSlideState = oldModalSlideState + 1;
+		t.modalSlideState.set(newModalSlideState);
+		console.log(t.modalSlideState.get());
+	},
+	'click #prev'(e, t) {
+		const oldModalSlideState = t.modalSlideState.get();
+		if (oldModalSlideState === 0) {
+			return false;
+		}
+		const newModalSlideState = oldModalSlideState - 1;
+		t.modalSlideState.set(newModalSlideState);
+		console.log(t.modalSlideState.get());
+	},
 	async 'submit #create-thread, click .js-save-thread'(event, instance) {
 		event.preventDefault();
 		const parentChannel = instance.parentChannel.get();
@@ -151,7 +204,8 @@ Template.CreateThread.onCreated(function() {
 	this.selectParent = new ReactiveVar(room && room.rid);
 
 	this.reply = new ReactiveVar('');
-
+	
+	this.modalSlideState = new ReactiveVar(0);
 
 	this.selectedRoom = new ReactiveVar(room ? [room] : []);
 

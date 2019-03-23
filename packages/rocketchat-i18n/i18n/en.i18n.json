@@ -2792,6 +2792,8 @@
   "This_month": "This Month",
   "This_room_has_been_archived_by__username_": "This room has been archived by __username__",
   "This_room_has_been_unarchived_by__username_": "This room has been unarchived by __username__",
+  "Thread_modal_prev": "Prev",
+  "Thread_modal_next": "Next",
   "Thread_creation_on_home": "Create threads on home screen",
   "Thread_default_parent_Channel": "Default channel for new Threads",
   "Thread_from_context_menu": "Threads in context-menu",

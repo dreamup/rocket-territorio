@@ -224,6 +224,12 @@
 	}
 }
 
+.rc-space-between {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
 @media (width <= 500px) {
 	.rc-grid {
 		display: flex;
