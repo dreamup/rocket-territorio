@@ -6,9 +6,9 @@
 # 4.  `snapcraft stage`
 # 5.  `snapcraft snap`
 
-name: rocketchat-server
-version: #{RC_VERSION}
-summary: Rocket.Chat server
+name: rocket-territori-server
+version: 0.1-territori
+summary: Rocket.Chat Fork for Territori Bios
 description: Have your own Slack like online chat, built with Meteor. https://rocket.chat/
 confinement: strict
 assumes: [snapd2.21]
