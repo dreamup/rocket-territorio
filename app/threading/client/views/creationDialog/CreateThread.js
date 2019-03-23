@@ -204,7 +204,6 @@ Template.CreateThread.onCreated(function() {
 	this.selectParent = new ReactiveVar(room && room.rid);
 
 	this.reply = new ReactiveVar('');
-	
 	this.modalSlideState = new ReactiveVar(0);
 
 	this.selectedRoom = new ReactiveVar(room ? [room] : []);
