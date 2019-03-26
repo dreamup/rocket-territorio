@@ -32,3 +32,12 @@
 .threads-list .load-more .load-more-loading {
 	color: #aaaaaa;
 }
+
+.rc-input-radio__container {
+	margin: 5px;
+	padding: 4px;
+
+	border: 2px solid;
+	border-color: var(--input-border-color);
+	border-radius: var(--input-border-radius);
+}

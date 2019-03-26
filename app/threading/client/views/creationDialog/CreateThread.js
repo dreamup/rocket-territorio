@@ -18,22 +18,43 @@ Template.CreateThread.helpers({
 	onSelectUser() {
 		return Template.instance().onSelectUser;
 	},
+	selectedTags() {
+		return Template.instance().selectedTags.get();
+	},
 	disabled() {
 		if (Template.instance().selectParent.get()) {
 			return 'disabled';
 		}
 	},
-	isFirstSlide() {
+	tags() {
+		return {
+			coltura: ['cereali', 'frutta', 'ortaggi', 'vite', 'olivo', 'prati', 'altro'],
+			tipo: ['campo', 'trasformazione', 'cert bio', 'altro'],
+			genere: ['manutenzione', 'suolo', 'infestanti', 'difesa'],
+			motivo: ['parassita', 'patogeno', 'qualità'],
+		};
+	},
+	isSlide0() {
 		return Template.instance().modalSlideState.get() === 0;
 	},
-	isSecondSlide() {
+	// coltura
+	isSlide1() {
 		return Template.instance().modalSlideState.get() === 1;
 	},
-	isThirdSlide() {
+	// tipo
+	isSlide2() {
 		return Template.instance().modalSlideState.get() === 2;
 	},
-	isLastSlide() {
+	// genere
+	isSlide3() {
 		return Template.instance().modalSlideState.get() === 3;
+	},
+	// motivo
+	isSlide4() {
+		return Template.instance().modalSlideState.get() === 4;
+	},
+	isLastSlide() {
+		return Template.instance().modalSlideState.get() === 5;
 	},
 	prevIsDisabled() {
 		if (Template.instance().modalSlideState.get() > 0) {
@@ -44,18 +65,33 @@ Template.CreateThread.helpers({
 	nextIsDisabled() {
 		const instance = Template.instance();
 		const modalSlideState = instance.modalSlideState.get();
-		if (modalSlideState === 0 && instance.parentChannel.get()) {
+		const selectedTags = instance.selectedTags.get();
+		// the first slide is the thread name
+		if (modalSlideState === 0 && instance.threadName.get()) {
 			return '';
 		}
-		if (modalSlideState === 1) {
+
+		if (modalSlideState === 1 && selectedTags.coltura) {
 			return '';
 		}
-		if (modalSlideState === 2 && instance.threadName.get()) {
+
+		if (modalSlideState === 2 && selectedTags.tipo) {
 			return '';
 		}
-		if (modalSlideState === 3 && instance.reply.get()) {
+
+		if (modalSlideState === 3 && selectedTags.genere) {
 			return '';
 		}
+
+		if (modalSlideState === 4 && selectedTags.motivo) {
+			return '';
+		}
+
+		// the last slide is the reply
+		if (modalSlideState === 5 && instance.reply.get()) {
+			return '';
+		}
+
 		return 'disabled';
 	},
 	targetChannelText() {
@@ -129,13 +165,19 @@ Template.CreateThread.events({
 	'input #thread_name'(e, t) {
 		t.threadName.set(e.target.value);
 	},
+	'change .rc-input__radio'(e, t) {
+		const selectedTags = _.extend({}, t.selectedTags.get());
+		selectedTags[e.target.name] = e.target.value;
+		console.log(selectedTags);
+		t.selectedTags.set(selectedTags);
+	},
 	'input #thread_message'(e, t) {
 		const { value } = e.target;
 		t.reply.set(value);
 	},
 	'click #next'(e, t) {
 		const oldModalSlideState = t.modalSlideState.get();
-		if (oldModalSlideState > 2) {
+		if (oldModalSlideState > 4) {
 			return false;
 		}
 		const newModalSlideState = oldModalSlideState + 1;
@@ -158,7 +200,7 @@ Template.CreateThread.events({
 		const { pmid } = instance;
 		const t_name = instance.threadName.get();
 		const users = instance.selectedUsers.get().map(({ username }) => username).filter((value, index, self) => self.indexOf(value) === index);
-
+		const tags = instance.selectedTags.get();
 		const prid = instance.parentChannelId.get();
 		const reply = instance.reply.get();
 
@@ -166,7 +208,7 @@ Template.CreateThread.events({
 			const errorText = TAPi18n.__('Invalid_room_name', `${ parentChannel }...`);
 			return toastr.error(errorText);
 		}
-		const result = await call('createThread', { prid, pmid, t_name, reply, users });
+		const result = await call('createThread', { prid, pmid, t_name, reply, users, tags });
 		// callback to enable tracking
 		callbacks.run('afterCreateThread', Meteor.user(), result);
 
@@ -209,7 +251,12 @@ Template.CreateThread.onCreated(function() {
 
 	this.selectedRoom = new ReactiveVar(room ? [room] : []);
 
-	this.users = new ReactiveVar([]);
+	this.selectedTags = new ReactiveVar({
+		coltura: '',
+		tipo: '',
+		genere: '',
+		motivo: '',
+	});
 
 	this.onClickTagRoom = () => {
 		this.selectedRoom.set([]);
@@ -263,22 +310,28 @@ Template.CreateThread.onCreated(function() {
 	// }
 
 	Meteor.call('getRolesAndChannels', true, (error, users) => {
+		// get user roles
 		const { roles } = Meteor.user();
+		// get the first
 		const role = roles[0];
 		console.log('user roles', roles, role);
 		console.log('roles and channels', error, users);
 
+		// find the channell connected to the role
 		const userType = _.findWhere(users, { role });
 		console.log(userType);
 
+		// get channel by name
 		const roomByName = ChatRoom.findOne({ name: userType.channel });
 		console.log(roomByName); // roomByName._id
 
+		// set the parent channell
 		this.parentChannel.set(roomByName.name);
 		this.parentChannelId.set(roomByName._id);
 		this.selectParent.set(true);
 
 		// get all the users of a specific room, the true flag means "all users" not only the online ones
+		// set them as selected users
 		Meteor.call('getUsersOfRoom', roomByName._id, true, (error, users) => {
 			console.log('room users', users);
 			this.selectedUsers.set(users.records); // maybe this should be this.selectedUsers

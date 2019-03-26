@@ -4,7 +4,7 @@
 		<div class="create-channel__wrapper">
 			<p class="create-channel__description">{{_ "Threading_description"}}</p>
 			<form id="create-thread" class="create-channel__content">
-				{{#if isFirstSlide}}
+				{{#if false}}
 					{{#unless disabled}}
 						{{> SearchCreateThread
 								onClickTag=onClickTagRoom
@@ -35,7 +35,7 @@
 						</div>
 					{{/unless}}
 				{{/if}}
-				{{#if isSecondSlide}}
+				{{#if false}}
 					{{> SearchCreateThread
 							onClickTag=onClickTagUser
 							deleteLastItem=deleteLastItemUser
@@ -55,7 +55,7 @@
 					}}
 				{{/if}}
 				<div class="create-channel__inputs">
-					{{#if isThirdSlide}}
+					{{#if isSlide0}}
 						<div class="rc-input">
 							<label class="rc-input__label">
 								<div class="rc-input__title">{{_ "Thread_name"}}</div>
@@ -69,6 +69,38 @@
 								</div>
 							</label>
 						</div>
+					{{/if}}
+					{{#if isSlide1}}
+						{{> SetTag
+								name='Coltura'
+								inputName='coltura'
+								tags=tags.coltura
+								selectedTags=selectedTags.coltura
+						}}
+					{{/if}}
+					{{#if isSlide2}}
+						{{> SetTag
+								name='Tipo'
+								inputName='tipo'
+								tags=tags.tipo
+								selectedTags=selectedTags.tipo
+						}}
+					{{/if}}
+					{{#if isSlide3}}
+						{{> SetTag
+								name='Genere'
+								inputName='genere'
+								tags=tags.genere
+								selectedTags=selectedTags.genere
+						}}
+					{{/if}}
+					{{#if isSlide4}}
+						{{> SetTag
+								name='Motivo'
+								inputName='motivo'
+								tags=tags.motivo
+								selectedTags=selectedTags.motivo
+						}}
 					{{/if}}
 					{{#if isLastSlide}}
 						<div class="rc-input">
@@ -100,6 +132,22 @@
 			</div>
 		</div>
 	</section>
+</template>
+
+<template name="SetTag">
+	<div class="rc-input">
+		<div class="rc-input__title">{{name}}</div>
+		{{#each tags}}
+			<div class="rc-input-radio__container">
+				<input
+						checked="{{$eq ../selectedTags this}}"
+						class="rc-input__radio"
+						type="radio"
+						name="{{../inputName}}"
+						value="{{this}}"/> {{this}}
+			</div>
+		{{/each}}
+	</div>
 </template>
 
 <template name="SearchCreateThread">

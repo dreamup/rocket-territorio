@@ -41,7 +41,7 @@ export const mentionThreadMessage = (rid, user, msg, message_embedded) => {
 
 const cloneMessage = ({ _id, ...msg }) => ({ ...msg });
 
-export const create = ({ prid, pmid, t_name, reply, users }) => {
+export const create = ({ prid, pmid, t_name, reply, users, tags }) => {
 	// if you set both, prid and pmid, and the rooms doesnt match... should throw an error)
 	let message = false;
 	if (pmid) {
@@ -88,13 +88,20 @@ export const create = ({ prid, pmid, t_name, reply, users }) => {
 	// auto invite the replied message owner
 	const invitedUsers = message ? [message.u.username, ...users] : users;
 
+	console.log('tags', tags);
+
 	// threads are always created as private groups
 	const thread = createRoom('p', name, user.username, [...new Set(invitedUsers)], false, {
 		fname: t_name,
 		description: message.msg, // TODO threads remove
 		topic: p_room.name, // TODO threads remove
 		prid,
-		tags: ['yo', 'yo2'], // Custom tags
+		tags: {
+			coltura: tags.coltura,
+			tipo: tags.tipo,
+			genere: tags.genere,
+			motivo: tags.motivo,
+		}, // Custom tags
 	});
 
 	if (pmid) {
@@ -147,7 +154,7 @@ Meteor.methods({
 	* @param {string} t_name - thread name
 	* @param {string[]} users - users to be added
 	*/
-	createThread({ prid, pmid, t_name, reply, users }) {
+	createThread({ prid, pmid, t_name, reply, users, tags }) {
 
 		const uid = Meteor.userId();
 		if (!uid) {
@@ -158,6 +165,6 @@ Meteor.methods({
 			throw new Meteor.Error('error-action-not-allowed', 'You are not allowed to create a thread', { method: 'createThread' });
 		}
 
-		return create({ uid, prid, pmid, t_name, reply, users });
+		return create({ uid, prid, pmid, t_name, reply, users, tags });
 	},
 });
