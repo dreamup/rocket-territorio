@@ -6,8 +6,8 @@ IFS=$'\n\t'
 # Requires Node.js version 4.x
 # Do not run as root
 
-DEPLOY_DIR=/var/www/Rocket.Chat
-#DEPLOY_DIR=./build
+#DEPLOY_DIR=/var/www/Rocket.Chat
+DEPLOY_DIR=/opt/Rocket.Chat
 
 ### BUILD
 meteor npm install

@@ -7,6 +7,7 @@ import { AutoComplete } from 'meteor/mizzao:autocomplete';
 import { ChatRoom, ChatSubscription } from '../../../../models';
 import { Blaze } from 'meteor/blaze';
 import { call } from '../../../../ui-utils';
+import _ from 'underscore';
 
 import { TAPi18n } from 'meteor/tap:i18n';
 import toastr from 'toastr';
@@ -139,7 +140,7 @@ Template.CreateThread.events({
 		}
 		const newModalSlideState = oldModalSlideState + 1;
 		t.modalSlideState.set(newModalSlideState);
-		console.log(t.modalSlideState.get());
+		// console.log(t.modalSlideState.get());
 	},
 	'click #prev'(e, t) {
 		const oldModalSlideState = t.modalSlideState.get();
@@ -148,7 +149,7 @@ Template.CreateThread.events({
 		}
 		const newModalSlideState = oldModalSlideState - 1;
 		t.modalSlideState.set(newModalSlideState);
-		console.log(t.modalSlideState.get());
+		// console.log(t.modalSlideState.get());
 	},
 	async 'submit #create-thread, click .js-save-thread'(event, instance) {
 		event.preventDefault();
@@ -208,6 +209,7 @@ Template.CreateThread.onCreated(function() {
 
 	this.selectedRoom = new ReactiveVar(room ? [room] : []);
 
+	this.users = new ReactiveVar([]);
 
 	this.onClickTagRoom = () => {
 		this.selectedRoom.set([]);
@@ -251,14 +253,42 @@ Template.CreateThread.onCreated(function() {
 
 
 	// callback to allow setting a parent Channel or e. g. tracking the event using Piwik or GA
-	const { parentChannel, reply } = callbacks.run('openThreadCreationScreen') || {};
+	// const { parentChannel, reply } = callbacks.run('openThreadCreationScreen') || {};
 
-	if (parentChannel) {
-		this.parentChannel.set(parentChannel);
-	}
-	if (reply) {
-		this.reply.set(reply);
-	}
+	// if (parentChannel) {
+	// 	this.parentChannel.set(parentChannel);
+	// }
+	// if (reply) {
+	// 	this.reply.set(reply);
+	// }
+
+	Meteor.call('getRolesAndChannels', true, (error, users) => {
+		const { roles } = Meteor.user();
+		const role = roles[0];
+		console.log('user roles', roles, role);
+		console.log('roles and channels', error, users);
+
+		const userType = _.findWhere(users, { role });
+		console.log(userType);
+
+		const roomByName = ChatRoom.findOne({ name: userType.channel });
+		console.log(roomByName); // roomByName._id
+
+		this.parentChannel.set(roomByName.name);
+		this.parentChannelId.set(roomByName._id);
+		this.selectParent.set(true);
+
+		// get all the users of a specific room, the true flag means "all users" not only the online ones
+		Meteor.call('getUsersOfRoom', roomByName._id, true, (error, users) => {
+			console.log('room users', users);
+			this.selectedUsers.set(users.records); // maybe this should be this.selectedUsers
+		});
+
+		// callback to allow setting a parent Channel or e. g. tracking the event using Piwik or GA
+		callbacks.run('openThreadCreationScreen');
+	});
+
+
 });
 
 Template.SearchCreateThread.helpers({
