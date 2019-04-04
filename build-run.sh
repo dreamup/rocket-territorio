@@ -25,6 +25,9 @@ meteor build --server-only --directory $DEPLOY_DIR --allow-superuser
 cd $DEPLOY_DIR/bundle/programs/server
 npm install
 
+cd $DEPLOY_DIR
+tar -cvzf rocket.chat.tgz ./bundle/
+
 cd $DEPLOY_DIR/bundle
 NODE_ENV=production \
 PORT=3000 \
