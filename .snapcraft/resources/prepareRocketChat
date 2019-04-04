@@ -5,7 +5,8 @@
 
 cp /opt/Rocket.Chat/rocket.chat.tgz ./
 
-tar xf rocket.chat.tgz --strip 1
+#tar xf rocket.chat.tgz --strip 1
+tar xf rocket.chat.tgz --strip 2
 
 cd programs/server
 rm -rf npm/node_modules/meteor/emojione_emojione/node_modules/grunt-contrib-qunit
@@ -16,7 +17,7 @@ then
 fi
 
 export NODE_ENV=production
-npm i
+npm i --unsafe-perm
 
 # Ideally this will go away.  For some reason on install its installing node-v57-linux-x64-glibc but when actually running it is looking for node-v57-linux-x64-unknown
 if [[ $(uname -m) == "x86_64" ]]
