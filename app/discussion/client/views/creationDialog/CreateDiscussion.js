@@ -30,11 +30,46 @@ Template.CreateDiscussion.helpers({
 	},
 	tags() {
 		return {
-			coltura: ['cereali', 'frutta', 'ortaggi', 'vite', 'olivo', 'prati', 'altro'],
-			tipo: ['campo', 'trasformazione', 'cert bio', 'altro'],
-			genere: ['manutenzione', 'suolo', 'infestanti', 'difesa'],
-			motivo: ['parassita', 'patogeno', 'qualità'],
+			coltura: ['vite', 'olivo', 'cereali'],
+			// tipo: ['campo', 'trasformazione', 'cert bio', 'altro'],
+			genere: ['Agronomico', 'Fitosanitario'],
+			// motivo: ['parassita', 'patogeno', 'qualità'],
 		};
+	},
+	extendedInformations() {
+		const selectedTags = Template.instance().selectedTags.get();
+		const isViteOn = selectedTags.coltura.toLowerCase() === 'vite';
+		const isFitosanitarioOn = selectedTags.genere.toLowerCase() === 'fitosanitario';
+		const index = Template.instance().modalSlideState.get();
+		if (index === 1 && isViteOn) {
+			return [
+				{ i18n: 'Discussion_extended_info_eta', name: 'eta', values: ['0-5', '6-15', '> 15'] },
+				{ i18n: 'Discussion_extended_info_varieta', name: 'varieta', values: ['cabernet sauvignon ', 'merlot', 'carmenere', 'moscati', 'chardonnay', 'pinot', 'glera', 'altro'] },
+				{ i18n: 'Discussion_extended_info_allevamento', name: 'allevamento', values: ['cordone speronato', 'guyot', 'sylvoz', 'capovolto', 'altro'] },
+				{ i18n: 'Discussion_extended_info_posizione', name: 'posizione', values: ['collina', 'pianura'] },
+				{ i18n: 'Discussion_extended_info_esposizione', name: 'esposizione', values: ['nord', 'sud', 'ovest', 'est'] },
+			];
+		}
+		if (index === 2 && isFitosanitarioOn) {
+			return [
+				{
+					i18n: 'Discussion_extended_info_tipoFitosanitario',
+					name: 'tipoFitosanitario',
+					values: ['Funghi', 'Insetti', 'Acari', 'Altro'],
+				},
+			];
+		}
+	},
+	needExtendedInfos() {
+		const selectedTags = Template.instance().selectedTags.get();
+		const isViteOn = selectedTags.coltura.toLowerCase() === 'vite';
+		const isFitosanitarioOn = selectedTags.genere.toLowerCase() === 'fitosanitario';
+
+		if (!isViteOn && !isFitosanitarioOn) {
+			return false;
+		}
+
+		return isViteOn ? 'vite' : 'fitosanitario';
 	},
 	isSlide0() {
 		return Template.instance().modalSlideState.get() === 0;
@@ -43,20 +78,12 @@ Template.CreateDiscussion.helpers({
 	isSlide1() {
 		return Template.instance().modalSlideState.get() === 1;
 	},
-	// tipo
+	// genere
 	isSlide2() {
 		return Template.instance().modalSlideState.get() === 2;
 	},
-	// genere
-	isSlide3() {
-		return Template.instance().modalSlideState.get() === 3;
-	},
-	// motivo
-	isSlide4() {
-		return Template.instance().modalSlideState.get() === 4;
-	},
 	isLastSlide() {
-		return Template.instance().modalSlideState.get() === 5;
+		return Template.instance().modalSlideState.get() === 3;
 	},
 	prevIsDisabled() {
 		if (Template.instance().modalSlideState.get() > 0) {
@@ -74,23 +101,28 @@ Template.CreateDiscussion.helpers({
 		}
 
 		if (modalSlideState === 1 && selectedTags.coltura) {
-			return '';
+			if (selectedTags.coltura !== 'vite') {
+				return '';
+			}
+			if (selectedTags.eta &&
+				selectedTags.varieta &&
+				selectedTags.allevamento &&
+				selectedTags.posizione &&
+				selectedTags.esposizione) {
+				return '';
+			}
+			return 'disabled';
 		}
 
-		if (modalSlideState === 2 && selectedTags.tipo) {
-			return '';
-		}
-
-		if (modalSlideState === 3 && selectedTags.genere) {
-			return '';
-		}
-
-		if (modalSlideState === 4 && selectedTags.motivo) {
-			return '';
+		if (modalSlideState === 2 && selectedTags.genere) {
+			if (selectedTags.genere.toLowerCase() !== 'fitosanitario') {
+				return '';
+			}
+			return (selectedTags.tipoFitosanitario ? '' : 'disabled');
 		}
 
 		// the last slide is the reply
-		if (modalSlideState === 5 && instance.reply.get()) {
+		if (modalSlideState === 3 && instance.reply.get()) {
 			return '';
 		}
 
@@ -166,8 +198,21 @@ Template.CreateDiscussion.events({
 	},
 	'change .rc-input__radio'(e, t) {
 		const selectedTags = _.extend({}, t.selectedTags.get());
-		selectedTags[e.target.name] = e.target.value;
+		selectedTags[e.target.name] = e.target.value.toLowerCase();
 		console.log(selectedTags);
+
+		if (selectedTags.coltura.toLowerCase() !== 'vite') {
+			delete selectedTags.eta;
+			delete selectedTags.varieta;
+			delete selectedTags.allevamento;
+			delete selectedTags.posizione;
+			delete selectedTags.esposizione;
+		}
+
+		if (selectedTags.genere.toLowerCase() !== 'fitosanitario') {
+			delete selectedTags.tipoFitosanitario;
+		}
+
 		t.selectedTags.set(selectedTags);
 	},
 	'input #discussion_message'(e, t) {
@@ -254,9 +299,7 @@ Template.CreateDiscussion.onCreated(function() {
 
 	this.selectedTags = new ReactiveVar({
 		coltura: '',
-		tipo: '',
 		genere: '',
-		motivo: '',
 	});
 
 	this.onClickTagRoom = () => {
@@ -344,6 +387,14 @@ Template.CreateDiscussion.onCreated(function() {
 	});
 
 
+});
+
+Template.SetTag.helpers({
+	isFieldChecked(field, value, selected) {
+		// console.log(selected);
+		// const selectedTags = Template.instance().selectedTags.get();
+		return selected[field] === String(value);
+	},
 });
 
 Template.SearchCreateDiscussion.helpers({

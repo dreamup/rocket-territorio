@@ -2,7 +2,7 @@
 
 	<section class="create-channel">
 		<div class="create-channel__wrapper">
-			<p class="create-channel__description">{{_ "Discussion_description"}}</p>
+			{{#if false}}<p class="create-channel__description">{{_ "Discussion_description"}}</p>{{/if}}
 			<form id="create-discussion" class="create-channel__content">
 				{{#if false}}
 					{{#unless disabled}}
@@ -56,31 +56,21 @@
 								name='Coltura'
 								inputName='coltura'
 								tags=tags.coltura
+								selected=selectedTags
 								selectedTags=selectedTags.coltura
+								needExtendedInfos=needExtendedInfos
+								extendedInformations=extendedInformations
 						}}
 					{{/if}}
 					{{#if isSlide2}}
 						{{> SetTag
-								name='Tipo'
-								inputName='tipo'
-								tags=tags.tipo
-								selectedTags=selectedTags.tipo
-						}}
-					{{/if}}
-					{{#if isSlide3}}
-						{{> SetTag
 								name='Genere'
 								inputName='genere'
 								tags=tags.genere
+								selected=selectedTags
 								selectedTags=selectedTags.genere
-						}}
-					{{/if}}
-					{{#if isSlide4}}
-						{{> SetTag
-								name='Motivo'
-								inputName='motivo'
-								tags=tags.motivo
-								selectedTags=selectedTags.motivo
+								needExtendedInfos=needExtendedInfos
+								extendedInformations=extendedInformations
 						}}
 					{{/if}}
 					{{#if false}}
@@ -136,17 +126,47 @@
 
 <template name="SetTag">
 	<div class="rc-input">
-		<div class="rc-input__title">{{name}}</div>
-		{{#each tags}}
-			<div class="rc-input-radio__container">
-				<input
-						checked="{{$eq ../selectedTags this}}"
-						class="rc-input__radio"
-						type="radio"
-						name="{{../inputName}}"
-						value="{{this}}"/> {{this}}
+		<div class="rc-input-radios__container">
+			<div class="rc-input__title rc-input-radios__title">{{_ name}}</div>
+			<div class="flex-wrap">
+				{{#each tags}}
+					<div class="rc-input-radio__container">
+						<input
+								checked="{{$eq ../selectedTags this}}"
+								class="rc-input__radio"
+								type="radio"
+								name="{{../inputName}}"
+								id="{{../inputName}}__{{@index}}"
+								value="{{this}}"/>
+						<label
+								class="rc-input-radio__label"
+								for="{{../inputName}}__{{@index}}">{{this}}</label>
+					</div>
+				{{/each}}
 			</div>
-		{{/each}}
+			{{#if needExtendedInfos}}
+				{{#each info in extendedInformations}}
+					<div class="rc-input__title rc-input-radios__title">{{_ info.i18n}}</div>
+					<div class="flex-wrap">
+						{{#each value in info.values}}
+							<div class="rc-input-radio__container">
+								<input
+										checked="{{isFieldChecked info.name value selected}}"
+										class="rc-input__radio"
+										type="radio"
+										name="{{info.name}}"
+										id="{{info.name}}__{{@index}}"
+										value="{{value}}"/>
+								<label
+										class="rc-input-radio__label"
+										for="{{info.name}}__{{@index}}">{{value}}</label>
+							</div>
+						{{/each}}
+					</div>
+				{{/each}}
+			{{/if}}
+		</div>
+
 	</div>
 </template>
 
@@ -155,7 +175,7 @@
 		<label class="rc-input__label">
 			<div class="rc-input__title">{{_ label}}</div>
 			<div class="rc-input__wrapper">
-				{{# if icon}}
+				{{#if icon}}
 					<div class="rc-input__icon">
 						{{> icon block="rc-input__icon-svg" icon=icon}}
 					</div>

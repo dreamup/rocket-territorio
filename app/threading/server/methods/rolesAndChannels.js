@@ -5,7 +5,6 @@ Meteor.methods({
 		return [{
 			role: 'admin',
 			channel: 'euganei-supporto',
-			channel_id: 'KADYujaAd7GyTkRxQ',
 		},
 		{
 			role: 'euganei',
