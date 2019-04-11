@@ -24,7 +24,7 @@ set -e
 
 meteor build --server-only --directory $DEPLOY_DIR --allow-superuser
 
-cp ./.one-signal/edge/* $DEPLOY_DIR/bundle/web.browser
+cp ./.one-signal/edge/* $DEPLOY_DIR/bundle/programs/web.browser
 
 ### RUN
 cd $DEPLOY_DIR/bundle/programs/server
