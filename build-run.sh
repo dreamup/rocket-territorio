@@ -9,6 +9,9 @@ IFS=$'\n\t'
 #DEPLOY_DIR=/var/www/Rocket.Chat
 DEPLOY_DIR=/opt/Rocket.Chat
 
+rm -rf $DEPLOY_DIR/bundle/
+rm -rf $DEPLOY_DIR/rocket.chat.tgz
+
 ### BUILD
 meteor npm install
 meteor npm run postinstall
@@ -21,6 +24,8 @@ set -e
 
 meteor build --server-only --directory $DEPLOY_DIR --allow-superuser
 
+cp ./.one-signal/edge/* $DEPLOY_DIR/bundle/web.browser
+
 ### RUN
 cd $DEPLOY_DIR/bundle/programs/server
 npm install
@@ -28,10 +33,10 @@ npm install
 cd $DEPLOY_DIR
 tar -cvzf rocket.chat.tgz ./bundle/
 
-cd $DEPLOY_DIR/bundle
-NODE_ENV=production \
-PORT=3000 \
-ROOT_URL=http://localhost:3000 \
-MONGO_URL=mongodb://localhost:27017/rocketchat \
-MONGO_OPLOG_URL=mongodb://localhost:27017/local \
-node main.js
+#cd $DEPLOY_DIR/bundle
+#NODE_ENV=production \
+#PORT=3000 \
+#ROOT_URL=http://localhost:3000 \
+#MONGO_URL=mongodb://localhost:27017/rocketchat \
+#MONGO_OPLOG_URL=mongodb://localhost:27017/local \
+#node main.js
