@@ -414,6 +414,9 @@ integrations.triggerHandler = new class RocketChatIntegrationHandler {
 				data.user_id = message.u._id;
 				data.user_name = message.u.username;
 				data.text = message.msg;
+				data.room_owner = room.u;
+
+				// console.log('message sent, room \n', room);
 
 				if (message.alias) {
 					data.alias = message.alias;

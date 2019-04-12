@@ -56,7 +56,7 @@ class RoomStreamer extends Meteor.Streamer {
 class Notifications {
 	constructor() {
 		const self = this;
-		this.debug = false;
+		this.debug = true;
 		this.notifyUser = this.notifyUser.bind(this);
 		this.streamAll = new Meteor.Streamer('notify-all');
 		this.streamLogged = new Meteor.Streamer('notify-logged');
@@ -130,9 +130,9 @@ class Notifications {
 	}
 
 	notifyUser(userId, eventName, ...args) {
-		if (this.debug === true) {
-			console.log('notifyUser', [userId, eventName, ...args]);
-		}
+		// if (this.debug === true) {
+		console.log('notifyUser', [userId, eventName, ...args]);
+		// }
 		args.unshift(`${ userId }/${ eventName }`);
 		return this.streamUser.emit.apply(this.streamUser, args);
 	}
