@@ -56,7 +56,7 @@ class RoomStreamer extends Meteor.Streamer {
 class Notifications {
 	constructor() {
 		const self = this;
-		this.debug = true;
+		this.debug = false;
 		this.notifyUser = this.notifyUser.bind(this);
 		this.streamAll = new Meteor.Streamer('notify-all');
 		this.streamLogged = new Meteor.Streamer('notify-logged');

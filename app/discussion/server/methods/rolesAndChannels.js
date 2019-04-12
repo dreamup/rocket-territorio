@@ -15,4 +15,12 @@ Meteor.methods({
 			channel: 'biovenezie-supporto',
 		}];
 	},
+	updateUserOneSignalId(oneSignalId) {
+		console.log('os id:', oneSignalId);
+		return Meteor.users.update({
+			_id: Meteor.userId(),
+		}, {
+			$set: { oneSignalId },
+		});
+	},
 });

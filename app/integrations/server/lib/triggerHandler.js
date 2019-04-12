@@ -4,6 +4,8 @@ import { HTTP } from 'meteor/http';
 import * as Models from '../../../models';
 import { settings } from '../../../settings';
 import { getRoomByNameOrIdWithOptionToJoin, processWebhookMessage } from '../../../lib';
+// import { Subscriptions } from '../../../models';
+import { Users } from '../../../models';
 import { logger } from '../logger';
 import { integrations } from '../../lib/rocketchat';
 import _ from 'underscore';
@@ -415,8 +417,17 @@ integrations.triggerHandler = new class RocketChatIntegrationHandler {
 				data.user_name = message.u.username;
 				data.text = message.msg;
 				data.room_owner = room.u;
+				data.recipients = [];
 
-				// console.log('message sent, room \n', room);
+				// const subscriptions = Subscriptions.findByRoomId(room._id);
+				const subscriptions = Users.findByRoomId(room._id);
+				console.log('message sent, room \n', room);
+				console.log('\n owner', owner);
+
+				subscriptions.forEach((_user) => {
+					// console.log('user of room: ', _user, '\n');
+					if (_user._id !== message.u._id) { data.recipients.push(_user.oneSignalId); }
+				});
 
 				if (message.alias) {
 					data.alias = message.alias;
