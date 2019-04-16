@@ -7,7 +7,7 @@ import { t, getUserPreference, handleError } from '../../utils';
 import { AccountBox, menu, SideNav } from '../../ui-utils';
 import { callbacks } from '../../callbacks';
 import { settings } from '../../settings';
-import { hasAtLeastOnePermission } from '../../authorization';
+import { hasAtLeastOnePermission, hasPermission } from '../../authorization';
 import { modal } from '../../ui-utils';
 const setStatus = (status) => {
 	AccountBox.setStatus(status);
@@ -157,7 +157,6 @@ const toolbarButtons = (user) => [{
 	condition: () => hasAtLeastOnePermission(['create-c', 'create-p']),
 	action: (e) => {
 
-
 		const createChannel = (e) => {
 			e.preventDefault();
 			modal.open({
@@ -175,10 +174,33 @@ const toolbarButtons = (user) => [{
 			});
 		};
 
+		const createDiscussion = (e) => {
+			e.preventDefault();
+			modal.open({
+				title: t('Discussion_title'),
+				content: 'CreateDiscussion',
+				data: {
+					onCreate() {
+						modal.close();
+					},
+				},
+				modifier: 'modal',
+				showConfirmButton: false,
+				showCancelButton: false,
+				confirmOnEnter: false,
+			});
+		};
+
 		const discussionEnabled = settings.get('Discussion_enabled');
 		if (!discussionEnabled) {
 			return createChannel(e);
 		}
+
+		const channelEnabled = hasPermission('start-channel-rocket-territori');
+		if (!channelEnabled) {
+			return createDiscussion(e);
+		}
+
 		const config = {
 			columns: [
 				{
@@ -193,22 +215,7 @@ const toolbarButtons = (user) => [{
 								{
 									icon: 'discussion',
 									name: t('Discussion'),
-									action: (e) => {
-										e.preventDefault();
-										modal.open({
-											title: t('Discussion_title'),
-											content: 'CreateDiscussion',
-											data: {
-												onCreate() {
-													modal.close();
-												},
-											},
-											modifier: 'modal',
-											showConfirmButton: false,
-											showCancelButton: false,
-											confirmOnEnter: false,
-										});
-									},
+									action: (e) => createDiscussion,
 								},
 							],
 						},

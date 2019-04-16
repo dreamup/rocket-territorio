@@ -6,6 +6,7 @@ Meteor.startup(() => {
 	const permissions = [
 		{ _id: 'start-discussion', roles: ['admin', 'user', 'expert', 'guest'] },
 		{ _id: 'start-discussion-other-user', roles: ['admin', 'user', 'expert', 'owner'] },
+		{ _id: 'start-channel-rocket-territori', roles: ['admin', 'user', 'expert', 'owner'] },
 	];
 
 	for (const permission of permissions) {
