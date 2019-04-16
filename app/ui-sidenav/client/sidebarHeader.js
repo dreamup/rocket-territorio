@@ -215,7 +215,7 @@ const toolbarButtons = (user) => [{
 								{
 									icon: 'discussion',
 									name: t('Discussion'),
-									action: (e) => createDiscussion,
+									action: createDiscussion,
 								},
 							],
 						},
