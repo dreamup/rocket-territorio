@@ -7,7 +7,7 @@
 # 5.  `snapcraft snap`
 
 name: rocket-territori-server
-version: 0.1.1
+version: 0.1.2
 summary: Rocket.Chat Fork for Territori Bios
 description: Rocket.Chat Fork for Territori Bios
 confinement: strict
