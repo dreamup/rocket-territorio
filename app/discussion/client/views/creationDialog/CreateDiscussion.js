@@ -359,16 +359,16 @@ Template.CreateDiscussion.onCreated(function() {
 		const { roles } = Meteor.user();
 		// get the first
 		const role = roles[0];
-		console.log('user roles', roles, role);
-		console.log('roles and channels', error, users);
+		// console.log('user roles', roles, role);
+		// console.log('roles and channels', error, users);
 
 		// find the channell connected to the role
 		const userType = _.findWhere(users, { role });
-		console.log(userType);
+		console.log('user type', userType);
 
 		// get channel by name
 		const roomByName = ChatRoom.findOne({ name: userType.channel });
-		console.log(roomByName); // roomByName._id
+		console.log('room by name:', roomByName); // roomByName._id
 
 		// set the parent channell
 		this.parentChannel.set(roomByName.name);
@@ -377,9 +377,20 @@ Template.CreateDiscussion.onCreated(function() {
 
 		// get all the users of a specific room, the true flag means "all users" not only the online ones
 		// set them as selected users
-		Meteor.call('getUsersOfRoom', roomByName._id, true, (error, users) => {
-			console.log('room users', users);
-			this.selectedUsers.set(users.records); // maybe this should be this.selectedUsers
+		Meteor.call('getUsersOfRoom', roomByName._id, true, (error, roomUsers) => {
+			const userId = Meteor.userId();
+			const usersToInsert = [];
+			for (let i = 0; i < roomUsers.records.length; i++) {
+				const user = roomUsers.records[i];
+				// se l'utente e' un euganei o un biovenezie e non e' il creatore, skippa
+				if ((user.roles.includes('euganei') || user.roles.includes('biovenezie')) && user._id !== userId) {
+					continue;
+				}
+				usersToInsert.push(user);
+			}
+			console.log('room users', roomUsers, 'users to insert', usersToInsert);
+			// setta gli utenti su usersToInsert
+			this.selectedUsers.set(usersToInsert);
 		});
 
 		// callback to allow setting a parent Channel or e. g. tracking the event using Piwik or GA
