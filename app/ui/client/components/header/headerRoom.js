@@ -29,7 +29,9 @@ Template.headerRoom.helpers({
 	},
 	avatarBackground() {
 		const roomData = Session.get(`roomData${ this._id }`);
-		if (!roomData) { return ''; }
+		if (!roomData) {
+			return '';
+		}
 		return roomTypes.getSecondaryRoomName(roomData.t, roomData) || roomTypes.getRoomName(roomData.t, roomData);
 	},
 	buttons() {
@@ -47,13 +49,17 @@ Template.headerRoom.helpers({
 
 	state() {
 		const sub = ChatSubscription.findOne({ rid: this._id }, { fields: { f: 1 } });
-		if (((sub != null ? sub.f : undefined) != null) && sub.f && favoritesEnabled()) { return ' favorite-room'; }
+		if (((sub != null ? sub.f : undefined) != null) && sub.f && favoritesEnabled()) {
+			return ' favorite-room';
+		}
 		return 'empty';
 	},
 
 	favoriteLabel() {
 		const sub = ChatSubscription.findOne({ rid: this._id }, { fields: { f: 1 } });
-		if (((sub != null ? sub.f : undefined) != null) && sub.f && favoritesEnabled()) { return 'Unfavorite'; }
+		if (((sub != null ? sub.f : undefined) != null) && sub.f && favoritesEnabled()) {
+			return 'Unfavorite';
+		}
 		return 'Favorite';
 	},
 
@@ -63,21 +69,37 @@ Template.headerRoom.helpers({
 
 	roomName() {
 		const roomData = Session.get(`roomData${ this._id }`);
-		if (!roomData) { return ''; }
+		if (!roomData) {
+			return '';
+		}
 
 		return roomTypes.getRoomName(roomData.t, roomData);
 	},
 
 	secondaryName() {
 		const roomData = Session.get(`roomData${ this._id }`);
-		if (!roomData) { return ''; }
+		if (!roomData) {
+			return '';
+		}
 
 		return roomTypes.getSecondaryRoomName(roomData.t, roomData);
 	},
 
+	tags() {
+		const roomData = Session.get(`roomData${ this._id }`);
+
+		if (!roomData || !roomData.topic) {
+			return '';
+		}
+
+		return roomData.tags;
+	},
+
 	roomTopic() {
 		const roomData = Session.get(`roomData${ this._id }`);
-		if (!roomData || !roomData.topic) { return ''; }
+		if (!roomData || !roomData.topic) {
+			return '';
+		}
 
 		let roomTopic = Markdown.parse(roomData.topic);
 
@@ -91,12 +113,16 @@ Template.headerRoom.helpers({
 		// apostrophe (') back to &#39;
 		roomTopic = roomTopic.replace(/\'/g, '&#39;');
 
+		console.log('room data: ', roomData);
+
 		return roomTopic;
 	},
 
 	roomIcon() {
 		const roomData = Session.get(`roomData${ this._id }`);
-		if (!(roomData != null ? roomData.t : undefined)) { return ''; }
+		if (!(roomData != null ? roomData.t : undefined)) {
+			return '';
+		}
 
 		return roomTypes.getIcon(roomData);
 	},
